@@ -1,3 +1,23 @@
+/* ESLint configuration start */
+/* eslint-env browser, jquery */
+/* eslint indent: ["warn", 2] */
+/* global NAVTREE:false */
+/* global NAVTREEINDEX:false */
+/* global SYNCOFFMSG:false */
+/* global SYNCONMSG:false */
+/* ESLint configuration end */
+
+/*
+ * `NAVTREE` and `NAVTREEINDEX` are external read-only arrays defined in
+ * `navtreedata.js`. `SYNCOFFMSG` and `SYNCONMSG` are external read-only
+ *  strings defined in the same `navtreedata.js`.
+ *
+ * HTML pages include this:
+ *
+ *     <script type="text/javascript" src="navtreedata.js"></script>
+ *     <script type="text/javascript" src="navtree.js"></script>
+ */
+
 /*
  @licstart  The following is the entire license notice for the
  JavaScript code in this file.
@@ -74,7 +94,7 @@ function localStorageSupported()
 function storeLink(link)
 {
   if (!$("#nav-sync").hasClass('sync') && localStorageSupported()) {
-      window.localStorage.setItem('navpath',link);
+    window.localStorage.setItem('navpath',link);
   }
 }
 
@@ -105,7 +125,7 @@ function getScript(scriptName,func,show)
   if ($.browser.msie && $.browser.version<=8) {
     // script.onload does not work with older versions of IE
     script.onreadystatechange = function() {
-      if (script.readyState=='complete' || script.readyState=='loaded') {
+      if (script.readyState==='complete' || script.readyState==='loaded') {
         func(); if (show) showRoot();
       }
     }
@@ -206,18 +226,18 @@ function newNode(o, po, text, link, childrenData, lastNode)
   a.appendChild(node.label);
   if (link) {
     var url;
-    if (link.substring(0,1)=='^') {
+    if (link.substring(0,1)==='^') {
       url = link.substring(1);
       link = url;
     } else {
       url = node.relpath+link;
     }
     a.className = stripPath(link.replace('#',':'));
-    if (link.indexOf('#')!=-1) {
+    if (link.indexOf('#')!==-1) {
       var aname = '#'+link.split('#')[1];
       var srcPage = stripPath(pathName());
       var targetPage = stripPath(link.split('#')[0]);
-      a.href = srcPage!=targetPage ? url : "javascript:void(0)";
+      a.href = srcPage!==targetPage ? url : "javascript:void(0)";
       a.onclick = function(){
         storeLink(link);
         if (!$(a).parent().parent().hasClass('selected'))
@@ -235,7 +255,7 @@ function newNode(o, po, text, link, childrenData, lastNode)
       a.onclick = function() { storeLink(link); }
     }
   } else {
-    if (childrenData != null)
+    if (childrenData !== null)
     {
       a.className = "nolink";
       a.href = "javascript:void(0)";
@@ -307,12 +327,12 @@ function highlightAnchor()
 {
   var aname = hashUrl();
   var anchor = $(aname);
-  if (anchor.parent().attr('class')=='memItemLeft'){
+  if (anchor.parent().attr('class')==='memItemLeft'){
     var rows = $('.memberdecls tr[class$="'+hashValue()+'"]');
     glowEffect(rows.children(),300); // member without details
-  } else if (anchor.parent().attr('class')=='fieldname'){
+  } else if (anchor.parent().attr('class')==='fieldname'){
     glowEffect(anchor.parent().parent(),1000); // enum value
-  } else if (anchor.parent().attr('class')=='fieldtype'){
+  } else if (anchor.parent().attr('class')==='fieldtype'){
     glowEffect(anchor.parent().parent(),1000); // struct field
   } else if (anchor.parent().is(":header")) {
     glowEffect(anchor.parent(),1000); // section header
@@ -349,7 +369,7 @@ function showNode(o, node, index, hash)
 {
   if (node && node.childrenData) {
     if (typeof(node.childrenData)==='string') {
-      var varName    = node.childrenData;
+      var varName = node.childrenData;
       getScript(node.relpath+varName,function(){
         node.childrenData = getData(varName);
         showNode(o,node,index,hash);
@@ -366,7 +386,10 @@ function showNode(o, node, index, hash)
         showNode(o,n,index+1,hash);
       } else {
         if (typeof(n.childrenData)==='string') {
-          var varName = n.childrenData;
+          // Should be `let varName = …` but Opera-Mini does not support it.
+          // Is Opera-Mini support required? If not, remove this comment, the
+          // `eslint-disable-line` too, and change `var` to `let`.
+          var varName = n.childrenData; // eslint-disable-line no-redeclare
           getScript(n.relpath+varName,function(){
             n.childrenData = getData(varName);
             node.expanded=false;
@@ -374,7 +397,7 @@ function showNode(o, node, index, hash)
           },true);
         } else {
           var rootBase = stripPath(o.toroot.replace(/\..+$/, ''));
-          if (rootBase=="index" || rootBase=="pages" || rootBase=="search") {
+          if (rootBase==="index" || rootBase==="pages" || rootBase==="search") {
             expandNode(o, n, true, true);
           }
           selectAndHighlight(hash,n);
@@ -404,10 +427,10 @@ function getNode(o, po)
   var insertFunction = removeToInsertLater(po.li);
   po.childrenVisited = true;
   var l = po.childrenData.length-1;
-  for (var i in po.childrenData) {
+  for (var i=0; i<po.childrenData.length; i++) {
     var nodeData = po.childrenData[i];
     po.children[i] = newNode(o, po, nodeData[0], nodeData[1], nodeData[2],
-      i==l);
+      i===l);
   }
   insertFunction();
 }
@@ -416,7 +439,7 @@ function gotoNode(o,subIndex,root,hash,relpath)
 {
   var nti = navTreeSubIndices[subIndex][root+hash];
   o.breadcrumbs = $.extend(true, [], nti ? nti : navTreeSubIndices[subIndex][root]);
-  if (!o.breadcrumbs && root!=NAVTREE[0][1]) { // fallback: show index
+  if (!o.breadcrumbs && root!==NAVTREE[0][1]) { // fallback: show index
     navTo(o,NAVTREE[0][1],"",relpath);
     $('.item').removeClass('selected');
     $('.item').removeAttr('id');
@@ -444,7 +467,7 @@ function navTo(o,root,hash,relpath)
   var url=root+hash;
   var i=-1;
   while (NAVTREEINDEX[i+1]<=url) i++;
-  if (i==-1) { i=0; root=NAVTREE[0][1]; } // fallback: show index
+  if (i===-1) { i=0; root=NAVTREE[0][1]; } // fallback: show index
   if (navTreeSubIndices[i]) {
     gotoNode(o,i,root,hash,relpath)
   } else {
@@ -459,12 +482,12 @@ function navTo(o,root,hash,relpath)
 
 function showSyncOff(n,relpath)
 {
-    n.html('<img src="'+relpath+'sync_off.png" title="'+SYNCOFFMSG+'"/>');
+  n.html('<img src="'+relpath+'sync_off.png" title="'+SYNCOFFMSG+'"/>');
 }
 
 function showSyncOn(n,relpath)
 {
-    n.html('<img src="'+relpath+'sync_on.png" title="'+SYNCONMSG+'"/>');
+  n.html('<img src="'+relpath+'sync_on.png" title="'+SYNCONMSG+'"/>');
 }
 
 function toggleSyncButton(relpath)
@@ -481,7 +504,8 @@ function toggleSyncButton(relpath)
   }
 }
 
-function initNavTree(toroot,relpath)
+// Externally used.
+function initNavTree(toroot,relpath) // eslint-disable-line no-unused-vars
 {
   var o = new Object();
   o.toroot = toroot;
@@ -517,24 +541,23 @@ function initNavTree(toroot,relpath)
   });
 
   $(window).bind('hashchange', function(){
-     if (window.location.hash && window.location.hash.length>1){
-       var a;
-       if ($(location).attr('hash')){
-         var clslink=stripPath(pathName())+':'+hashValue();
-         a=$('.item a[class$="'+clslink.replace(/</g,'\\3c ')+'"]');
-       }
-       if (a==null || !$(a).parent().parent().hasClass('selected')){
-         $('.item').removeClass('selected');
-         $('.item').removeAttr('id');
-       }
-       var link=stripPath2(pathName());
-       navTo(o,link,hashUrl(),relpath);
-     } else if (!animationInProgress) {
-       $('#doc-content').scrollTop(0);
-       $('.item').removeClass('selected');
-       $('.item').removeAttr('id');
-       navTo(o,toroot,hashUrl(),relpath);
-     }
+    if (window.location.hash && window.location.hash.length>1){
+      var a;
+      if ($(location).attr('hash')){
+        var clslink=stripPath(pathName())+':'+hashValue();
+        a=$('.item a[class$="'+clslink.replace(/</g,'\\3c ')+'"]');
+      }
+      if (a===null || !$(a).parent().parent().hasClass('selected')){
+        $('.item').removeClass('selected');
+        $('.item').removeAttr('id');
+      }
+      var link=stripPath2(pathName());
+      navTo(o,link,hashUrl(),relpath);
+    } else if (!animationInProgress) {
+      $('#doc-content').scrollTop(0);
+      $('.item').removeClass('selected');
+      $('.item').removeAttr('id');
+      navTo(o,toroot,hashUrl(),relpath);
+    }
   })
 }
-/* @license-end */
